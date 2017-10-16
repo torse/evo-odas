@@ -3,15 +3,12 @@ import os
 import config
 
 #
-<<<<<<< HEAD
 # DAG
 #
 
 dag_schedule_interval='@hourly'
 
 #
-=======
->>>>>>> a7778964d27e7c75cd0b3cb6bbac80a1792c7938
 # Collection
 #
 id = "S1_GRD_1SDV"
@@ -45,20 +42,14 @@ dhus_search_keywords = {
 geoserver_workspace = "sentinel"
 geoserver_layer = "SENTINEL1"
 geoserver_coverage = "SENTINEL1"
-<<<<<<< HEAD
 geoserver_featuretype = "SENTINEL1_FT"
-=======
->>>>>>> a7778964d27e7c75cd0b3cb6bbac80a1792c7938
 geoserver_oseo_collection="SENTINEL1"
 geoserver_oseo_wms_width = 768
 geoserver_oseo_wms_height = 768
 geoserver_oseo_wms_format = "image/png"
-<<<<<<< HEAD
 geoserver_oseo_wcs_scale_i = 0.01
 geoserver_oseo_wcs_scale_j = 0.01
 geoserver_oseo_wcs_format = "image/tiff"
-=======
->>>>>>> a7778964d27e7c75cd0b3cb6bbac80a1792c7938
 
 #
 # Product

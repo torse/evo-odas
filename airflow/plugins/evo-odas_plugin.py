@@ -1,11 +1,7 @@
 import logging
 import pprint
-<<<<<<< HEAD
 import os
 import six
-=======
-import os 
->>>>>>> a7778964d27e7c75cd0b3cb6bbac80a1792c7938
 import fnmatch
 from airflow.operators import BashOperator
 from airflow.operators import BaseOperator
@@ -106,7 +102,6 @@ class RSYNCOperator(BaseOperator):
         # check default XCOM key in task_id 'get_inputs_from'
         files_str = ""
         if self.get_inputs_from != None:
-<<<<<<< HEAD
             files = context['task_instance'].xcom_pull(task_ids=self.get_inputs_from, key=XCOM_RETURN_KEY)
 
             # stop processing if there are no products
@@ -120,18 +115,6 @@ class RSYNCOperator(BaseOperator):
                 for f in files:
                     files_str += " " + f
                 log.info("Retrieving input from task_id '{}'' and key '{}'".format(self.get_inputs_from, XCOM_RETURN_KEY))
-=======
-            files_dict = context['task_instance'].xcom_pull(task_ids=self.get_inputs_from, key=XCOM_RETURN_KEY)
-
-            # stop processing if there are no products
-            if files_dict is None:
-                log.info("Nothing to process.")
-                return
-
-            for f in files_dict:
-                files_str += " " + f
-            log.info("Retrieving input from task_id '{}'' and key '{}'".format(self.get_inputs_from, XCOM_RETURN_KEY))
->>>>>>> a7778964d27e7c75cd0b3cb6bbac80a1792c7938
         else:
             # init XCom parameters
             if self.xk_pull_dag_id is None:
@@ -151,15 +134,12 @@ class RSYNCOperator(BaseOperator):
         bo = BashOperator(task_id='bash_operator_rsync_', bash_command=bash_command)
         bo.execute(context)
 
-<<<<<<< HEAD
         # construct list of filenames uploaded to remote host
         files_list = files_str.split()
         filenames_list = list(os.path.join(self.remote_dir, os.path.basename(path)) for path in files_list)
 
         return filenames_list
 
-=======
->>>>>>> a7778964d27e7c75cd0b3cb6bbac80a1792c7938
 class S1MetadataOperator(BaseOperator):
     @apply_defaults
     def __init__(self, product_safe_path, granules_paths, granules_upload_dir, working_dir, get_inputs_from=None, xk_pull_dag_id=None, xk_pull_task_id=None, xk_pull_key_safe=None, xk_pull_key_granules_paths=None, xk_push_key=None,

@@ -103,20 +103,14 @@ class Sentinel2MetadataOperator(BaseOperator):
         bands_dict,
         remote_dir,
         GS_WORKSPACE,
-<<<<<<< HEAD
         GS_FEATURETYPE,
-=======
->>>>>>> a7778964d27e7c75cd0b3cb6bbac80a1792c7938
         GS_LAYER,
         GS_WMS_WIDTH,
         GS_WMS_HEIGHT,
         GS_WMS_FORMAT,
-<<<<<<< HEAD
         GS_WCS_SCALE_I,
         GS_WCS_SCALE_J,
         GS_WCS_FORMAT,
-=======
->>>>>>> a7778964d27e7c75cd0b3cb6bbac80a1792c7938
         coverage_id,
         get_inputs_from=None,
         *args, **kwargs):
@@ -125,7 +119,6 @@ class Sentinel2MetadataOperator(BaseOperator):
             self.bands_dict = bands_dict
             self.GS_WORKSPACE = GS_WORKSPACE
             self.GS_LAYER = GS_LAYER
-<<<<<<< HEAD
             self.GS_FEATURETYPE = GS_FEATURETYPE
             self.GS_WMS_WIDTH = GS_WMS_WIDTH
             self.GS_WMS_HEIGHT = GS_WMS_HEIGHT
@@ -133,11 +126,6 @@ class Sentinel2MetadataOperator(BaseOperator):
             self.GS_WCS_SCALE_I = GS_WCS_SCALE_I
             self.GS_WCS_SCALE_J = GS_WCS_SCALE_J
             self.GS_WCS_FORMAT = GS_WCS_FORMAT            
-=======
-            self.GS_WMS_WIDTH = GS_WMS_WIDTH
-            self.GS_WMS_HEIGHT = GS_WMS_HEIGHT
-            self.GS_WMS_FORMAT = GS_WMS_FORMAT
->>>>>>> a7778964d27e7c75cd0b3cb6bbac80a1792c7938
             self.coverage_id = coverage_id
             self.get_inputs_from = get_inputs_from
             super(Sentinel2MetadataOperator, self).__init__(*args, **kwargs)
@@ -156,12 +144,9 @@ class Sentinel2MetadataOperator(BaseOperator):
             with s2reader.open(product) as s2_product:
                 coords = []
                 links=[]
-<<<<<<< HEAD
                 metadata=s2_product._product_metadata
                 granule=s2_product.granules[0]
                 granule_metadata=granule._metadata
-=======
->>>>>>> a7778964d27e7c75cd0b3cb6bbac80a1792c7938
                 product_footprint = [[[m.replace(" ", ",")] for m in str(s2_product.footprint).replace(", ", ",").partition('((')[-1].rpartition('))')[0].split(",")]]
                 for item in product_footprint[0]:
                     [x_coordinate, y_coordinate] = item[0].split(",")
@@ -169,7 +154,6 @@ class Sentinel2MetadataOperator(BaseOperator):
                 final_metadata_dict = {"type": "Feature", "geometry":
                 {"type": "Polygon", "coordinates":
                 [coords]},
-<<<<<<< HEAD
                 "properties": {
                     "eop:identifier": s2_product.manifest_safe_path.rsplit('.SAFE', 1)[0],
                     "timeStart": s2_product.product_start_time,
@@ -207,32 +191,6 @@ class Sentinel2MetadataOperator(BaseOperator):
                     "eop:illuminationElevationAngle": None, 
                     "eop:resolution": None}
                 }
-=======
-                "properties": {"eop:identifier": s2_product.manifest_safe_path.rsplit('.SAFE', 1)[0],
-                "timeStart": s2_product.product_start_time,
-                "timeEnd": s2_product.product_stop_time,
-                "originalPackageLocation": None, "thumbnailURL": None,
-                "quicklookURL": None, "eop:parentIdentifier": "SENTINEL2",
-                "eop:productionStatus": None, "eop:acquisitionType": None,
-                "eop:orbitNumber": s2_product.sensing_orbit_number, "eop:orbitDirection": s2_product.sensing_orbit_direction,
-                "eop:track": None, "eop:frame": None, "eop:swathIdentifier": None,
-                "opt:cloudCover": None,
-                "opt:snowCover": None, "eop:productQualityStatus": None,
-                "eop:productQualityDegradationStatus": None,
-                "eop:processorName": None,
-                "eop:processingCenter": None, "eop:creationDate": None,
-                "eop:modificationDate": None,
-                "eop:processingDate": None, "eop:sensorMode": None,
-                "eop:archivingCenter": None, "eop:processingMode": None,
-                "eop:availabilityTime": None,
-                "eop:acquisitionStation": None,
-                "eop:acquisitionSubtype": None,
-                "eop:startTimeFromAscendingNode": None,
-                "eop:completionTimeFromAscendingNode": None,
-                "eop:illuminationAzimuthAngle": None,
-                "eop:illuminationZenithAngle": None,
-                "eop:illuminationElevationAngle": None, "eop:resolution": None}}
->>>>>>> a7778964d27e7c75cd0b3cb6bbac80a1792c7938
                 for i in self.bands_res.values():
                     features_list = []
                     granule_counter = 1
@@ -265,7 +223,6 @@ class Sentinel2MetadataOperator(BaseOperator):
                                   "method": "GET",
                                   "code": "GetCapabilities",
                                   "type": "application/xml",
-<<<<<<< HEAD
                                   "href": "${BASE_URL}"+"/{}/{}/ows?service={}&request=GetCapabilities&CQL_FILTER=eoParentIdentifier='{}'".format(
                                         self.GS_WORKSPACE,
                                         self.GS_LAYER,
@@ -275,12 +232,6 @@ class Sentinel2MetadataOperator(BaseOperator):
             #Here we generate the dictionaries of GetMap, GetFeature and GetCoverage operations from util dir
             links.append(generate_wfs_dict(s2_product, self.GS_WORKSPACE, self.GS_FEATURETYPE))
             links.append(generate_wcs_dict(granule_coordinates, self.GS_WORKSPACE, s2_product, self.coverage_id, self.GS_WCS_FORMAT, self.GS_WCS_SCALE_I, self.GS_WCS_SCALE_J))
-=======
-                                  "href": "${BASE_URL}"+"/{}/{}/ows?service={}&request=GetCapabilities&version=1.3.0&CQL_FILTER=eoParentIdentifier='{}'".format(self.GS_WORKSPACE, self.GS_LAYER, service_name,s2_product.manifest_safe_path.rsplit('.SAFE', 1)[0])})
-            #Here we generate the dictionaries of GetMap, GetFeature and GetCoverage operations from util dir
-            links.append(generate_wfs_dict(s2_product, self.GS_WORKSPACE, self.GS_LAYER))
-            links.append(generate_wcs_dict(granule_coordinates, self.GS_WORKSPACE, s2_product, self.coverage_id))
->>>>>>> a7778964d27e7c75cd0b3cb6bbac80a1792c7938
             links.append(generate_wms_dict(self.GS_WORKSPACE, self.GS_LAYER, granule_coordinates, self.GS_WMS_WIDTH, self.GS_WMS_HEIGHT, self.GS_WMS_FORMAT, s2_product))
             final_owslinks_dict = {"links":links}
             with open(product.strip(".zip")+'/owsLinks.json', 'w') as owslinks_outfile:

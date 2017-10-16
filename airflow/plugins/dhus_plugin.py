@@ -164,15 +164,11 @@ class DHUSDownloadOperator(BaseOperator):
                 log.info("Product already downloaded. Continuing..")
                 continue
 
-<<<<<<< HEAD
             log.info('Downloading Product..\nuuid:  {}\ntitle: {}\nsize:  {}'.format(
                 product_id, 
                 self.products[product_id].get("title"),
                 self.products[product_id].get("size"))
             )
-=======
-            log.info('Download Product ID {}'.format(product_id))
->>>>>>> a7778964d27e7c75cd0b3cb6bbac80a1792c7938
             downloaded = api.download(product_id, directory_path=self.download_dir);
             path = downloaded['path']
             # TODO check if file in 'path' is binary.
