@@ -3,11 +3,14 @@ import os
 import config
 
 #
+<<<<<<< HEAD
 # DAG
 #
 dag_schedule_interval='@hourly'
 
 #
+=======
+>>>>>>> a7778964d27e7c75cd0b3cb6bbac80a1792c7938
 # Collection
 #
 id = "S2_MSI_L1C"
@@ -41,22 +44,33 @@ dhus_search_keywords = {
 # GeoServer
 #
 geoserver_workspace = "sentinel"
+<<<<<<< HEAD
 geoserver_featuretype = "product"
+=======
+>>>>>>> a7778964d27e7c75cd0b3cb6bbac80a1792c7938
 geoserver_layer = "SENTINEL2"
 geoserver_coverage = "SENTINEL2"
 geoserver_oseo_collection="SENTINEL2"
 geoserver_oseo_wms_width = 512
 geoserver_oseo_wms_height = 512
+<<<<<<< HEAD
 geoserver_oseo_wms_format = "image/jpeg"
 geoserver_oseo_wcs_scale_i = 0.01
 geoserver_oseo_wcs_scale_j = 0.01
 geoserver_oseo_wcs_format = "image/jp2"
+=======
+geoserver_oseo_wms_format = "JPEG2000"
+>>>>>>> a7778964d27e7c75cd0b3cb6bbac80a1792c7938
 
 #
 # Product
 #
 bands_res = {
+<<<<<<< HEAD
     '10':("B02","B03","B04","B08","TCI"),
+=======
+    '10':("B02","B03","B04","B08"),
+>>>>>>> a7778964d27e7c75cd0b3cb6bbac80a1792c7938
     '20':("B05","B06","B07","B8A","B11","B12"),
     '60':("B01","B09","B10")
 }
