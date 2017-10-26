@@ -64,8 +64,8 @@ def create_original_package(get_inputs_from=None, files_list=None, out_dir=None,
     task_instance = kwargs['ti']
     if get_inputs_from != None:
         log.info("Getting inputs from: " + pprint.pformat(get_inputs_from))
-        # Product ID from Search Task
-        product_id = task_instance.xcom_pull(task_ids=get_inputs_from['search_task_id'], key=XCOM_RETURN_KEY)
+        # Searched products from Search Task (list of tuples)
+        searched_prods = task_instance.xcom_pull(task_ids=get_inputs_from['search_task_id'], key=XCOM_RETURN_KEY)
         # Band TIFFs from download task
         files_list = task_instance.xcom_pull(task_ids=get_inputs_from['download_task_ids'], key=XCOM_RETURN_KEY)
 
@@ -78,8 +78,11 @@ def create_original_package(get_inputs_from=None, files_list=None, out_dir=None,
     m = re.match(r'(.*)_B.+\..+', filename)
     product_id = m.groups()[0]
     '''
+    product_ids = list(tup[0] for tup in searched_prods)
 
-    zipfile_path = os.path.join(out_dir, product_id[0] + '.zip')
+    # ONLY HANDLE 1 PRODUCT AT A TIME
+    product_id = product_ids[0]
+    zipfile_path = os.path.join(out_dir, product_id + '.zip')
     with zipfile.ZipFile(zipfile_path, 'w') as myzip:
         for file in files_list:
             myzip.write(file, os.path.basename(file))
@@ -279,7 +282,6 @@ class Landsat8MTLReaderOperator(BaseOperator):
                  gs_wfs_featuretype,
                  gs_wfs_format,
                  gs_wfs_version,
-                 gs_wcs_layer,
                  gs_wcs_scale_i,
                  gs_wcs_scale_j,
                  gs_wcs_coverage_id,
@@ -299,7 +301,6 @@ class Landsat8MTLReaderOperator(BaseOperator):
         self.gs_wfs_featuretype = gs_wfs_featuretype
         self.gs_wfs_format = gs_wfs_format
         self.gs_wfs_version = gs_wfs_version
-        self.gs_wcs_layer = gs_wcs_layer
         self.gs_wcs_scale_i = gs_wcs_scale_i
         self.gs_wcs_scale_j = gs_wcs_scale_j
         self.gs_wcs_coverage_id = gs_wcs_coverage_id
@@ -320,7 +321,7 @@ class Landsat8MTLReaderOperator(BaseOperator):
         original_package_paths = context["task_instance"].xcom_pull(self.get_inputs_from["upload_original_package_task_id"])
         original_package_path = original_package_paths [0]
         original_package_filename = os.path.basename(original_package_path)
-        original_package_location = self.original_package_download_base_url + original_package_filename
+        original_package_location = urljoin(self.original_package_download_base_url, original_package_filename)
         product_id = os.path.splitext(original_package_filename)[0]
         # Get GDALInfo output from XCom
         gdalinfo_task_id = self.get_inputs_from["gdalinfo_task_id"]
@@ -365,7 +366,6 @@ class Landsat8MTLReaderOperator(BaseOperator):
             gs_wfs_featuretype=self.gs_wfs_featuretype,
             gs_wfs_format=self.gs_wfs_format,
             gs_wfs_version=self.gs_wfs_version,
-            gs_wcs_layer=self.gs_wcs_layer,
             gs_wcs_coverage_id=self.gs_wcs_coverage_id,
             gs_wcs_scale_i=self.gs_wcs_scale_i,
             gs_wcs_scale_j=self.gs_wcs_scale_j,

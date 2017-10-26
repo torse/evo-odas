@@ -106,22 +106,6 @@ class Landsat8DownloadOperator(BaseOperator):
             except OSError as exc:
                if exc.errno == 17:  # directory already exists
                 pass
-<<<<<<< HEAD
-        url = download_url.replace(
-            "index.html", "{}_{}".format(product_id, self.url_fragment))
-        target_path = os.path.join(
-            target_dir,
-            "{}_{}".format(product_id, self.url_fragment)
-        )
-        try:
-            urllib.urlretrieve(url, target_path)
-        except Exception:
-            log.exception(
-                msg="Error downloading {}".format(self.url_fragment))
-            raise
-        else:
-            return target_path
-=======
             url = download_url.replace(
                "index.html", "{}_{}".format(product_id, self.url_fragment))
             target_path = os.path.join(
@@ -136,7 +120,6 @@ class Landsat8DownloadOperator(BaseOperator):
                raise
             else:
                return target_path
->>>>>>> 49efb582f75c2331f5eaa4a00fbd69c3be72975c
 
 class SearchDownloadDaraaPlugin(AirflowPlugin):
     name = "search_download_daraa_plugin"
