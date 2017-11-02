@@ -133,9 +133,7 @@ archive_wldprj_task = RSYNCOperator(task_id="upload_granules",
                                     dag=dag)
 
 ## Sentinel-2 Product.zip Operator.
-# The following variables are just pointing to placeholders until we implement the real files.
-CWR = os.path.dirname(os.path.realpath(__file__))
-placeholders_list = [os.path.join(CWR,"metadata.xml")]
+placeholders_list = [os.path.join(CFG.templates_base_dir,"metadata.xml")]
 generated_files_list = ['product/product.json','product/granules.json','product/thumbnail.jpeg', 'product/owsLinks.json']
 
 product_zip_task = Sentinel2ProductZipOperator(task_id = 'create_product_zip_task',
