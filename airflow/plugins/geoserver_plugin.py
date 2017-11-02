@@ -7,6 +7,8 @@ from airflow.utils.decorators import apply_defaults
 from airflow.models import XCOM_RETURN_KEY
 import config.xcom_keys as xk
 from geoserver.catalog import Catalog
+import json
+import os
 
 import sys
 reload(sys)
@@ -95,13 +97,13 @@ def generate_wfs_dict(product_identifier, gs_workspace, gs_featuretype, gs_wfs_f
         )
     }
 
-def generate_wms_dict(product_identifier, gs_workspace, gs_layer, bbox, gs_wms_width, gs_wms_height, gs_wms_format, gs_wms_version):
+def generate_wms_dict(product_identifier, gs_workspace, gs_layer, bbox, gs_wms_width, gs_wms_height, gs_wms_format, gs_wms_version, timestart, timeend):
     return {
         "offering": "http://www.opengis.net/spec/owc-atom/1.0/req/wms",
         "method": "GET",
         "code": "GetMap",
         "type": gs_wms_format,
-        "href": r"${BASE_URL}"+"/{}/{}/ows?service=wms&request=GetMap&version={}&LAYERS={}&BBOX={},{},{},{}&WIDTH={}&HEIGHT={}&FORMAT={}&CQL_FILTER=eoIdentifier='{}'".format(
+        "href": r"${BASE_URL}"+"/{}/{}/ows?service=wms&request=GetMap&version={}&LAYERS={}&BBOX={},{},{},{}&WIDTH={}&HEIGHT={}&FORMAT={}&CQL_FILTER=eoIdentifier='{}'&TIME={}/{}".format(
             gs_workspace,
             gs_layer,
             gs_wms_version,
@@ -113,7 +115,9 @@ def generate_wms_dict(product_identifier, gs_workspace, gs_layer, bbox, gs_wms_w
             gs_wms_width,
             gs_wms_height,
             gs_wms_format,
-            product_identifier
+            product_identifier,
+            timestart,
+            timeend
         )
     }
 
@@ -141,6 +145,8 @@ def generate_wcs_dict(product_identifier, bbox, gs_workspace, coverage_id, gs_wc
 
 def create_owslinks_dict(
         product_identifier,
+        timestart,
+        timeend,
         granule_bbox,
         gs_workspace,
         gs_wms_layer,
@@ -193,7 +199,9 @@ def create_owslinks_dict(
             gs_wms_width=gs_wms_width,
             gs_wms_height=gs_wms_height,
             gs_wms_format=gs_wms_format,
-            gs_wms_version=gs_wms_version
+            gs_wms_version=gs_wms_version,
+            timestart = timestart,
+            timeend = timeend
         )
     )
     links.append(
@@ -268,6 +276,56 @@ def publish_product(geoserver_username, geoserver_password, geoserver_rest_endpo
     else:
         log.warn("No product.zip found.")
         return list()
+
+def get_published_products(geoserver_username, geoserver_password, geoserver_rest_url, collection_id, *args, **kwargs):
+    # This function returns a list of published products ids 
+    log.info("get_published_products task")
+    log.info("""
+        geoserver_username: {}
+        geoserver_password: **
+        geoserver_rest_url: {}
+        collection_id: {}
+        """.format(
+            geoserver_username,
+            geoserver_rest_url,
+            collection_id
+        )
+    )
+    a = requests.auth.HTTPBasicAuth(geoserver_username, geoserver_password)
+    r = requests.get('{}/oseo/collections/{}/products'.format(geoserver_rest_url, collection_id), auth=a)
+    if r.ok:
+       published_products_dict = r.json()
+       # Here we fill up the already published products id's
+       published_products_ids = [ item["id"]  for item in published_products_dict.values()[0]]
+       return published_products_ids
+    else:
+       r.raise_for_status()
+
+
+def is_product_published(geoserver_username, geoserver_password, geoserver_rest_url, collection_id, product_id, *args, **kwargs):
+    # This function returns True if it found the product was published, False if not found
+    log.info("is_product_published called")
+    log.info("""
+        geoserver_username: {}
+        geoserver_password: **
+        geoserver_rest_endpoint: {}
+        collection_id: {}
+        product_id: {}
+        """.format(
+            geoserver_username,
+            os.path.join(geoserver_rest_url,"oseo","collections",collection_id,"products",product_id),
+            collection_id,
+            product_id
+        )
+    )
+    a = requests.auth.HTTPBasicAuth(geoserver_username, geoserver_password)
+    r = requests.get("{}/oseo/collections/{}/products/{}".format(geoserver_rest_url, collection_id, product_id), auth=a)
+    if r.status_code == 200:
+       return True
+    elif r.status_code == 404:
+       return False
+    else:
+       r.raise_for_status()
 
 class GDALPlugin(AirflowPlugin):
     name = "GeoServer_plugin"

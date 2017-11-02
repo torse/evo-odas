@@ -27,7 +27,7 @@ default_args = {
     ##################################################
     # General configuration
     #
-    'start_date': datetime.now() - timedelta(hours=1),
+    'start_date': datetime.now(),
     'owner': 'airflow',
     'depends_on_past': False,
     'provide_context': True,
@@ -190,7 +190,7 @@ metadata_task = S1MetadataOperator(task_id="extract_metadata_task",
                                    product_safe_path=None,
                                    granules_paths=None,
                                    granules_upload_dir=S1GRD1SDV.repository_dir,
-                                   working_dir=S1GRD1SDV.process_dir,
+                                   processing_dir=S1GRD1SDV.process_dir,
                                    original_package_download_base_url=S1GRD1SDV.original_package_download_base_url,
                                    gs_workspace=S1GRD1SDV.geoserver_workspace,
                                    bands_dict = S1GRD1SDV.bands_dict,

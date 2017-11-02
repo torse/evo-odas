@@ -14,7 +14,7 @@ default_args = {
     ##################################################
     # General configuration
     #
-    'start_date': datetime.now() - timedelta(hours=1),
+    'start_date': datetime.now(),
     'owner': 'airflow',
     'depends_on_past': False,
     'provide_context': True,
@@ -124,7 +124,7 @@ metadata_task = Sentinel2MetadataOperator(task_id = 'extract_metadata_task',
                                           dag = dag)
 
 # Archive Sentinel-2 RSYNC with .prj and .wld files Task Operator
-archive_wldprj_task = RSYNCOperator(task_id="archive_wldprj_task",
+archive_wldprj_task = RSYNCOperator(task_id="upload_granules",
                                     host = CFG.rsync_hostname, 
                                     remote_usr = CFG.rsync_username,
                                     ssh_key_file = CFG.rsync_ssh_key, 
@@ -135,7 +135,7 @@ archive_wldprj_task = RSYNCOperator(task_id="archive_wldprj_task",
 ## Sentinel-2 Product.zip Operator.
 # The following variables are just pointing to placeholders until we implement the real files.
 CWR = os.path.dirname(os.path.realpath(__file__))
-placeholders_list = [os.path.join(CWR,"metadata.xml"), os.path.join(CWR,"description.html")]
+placeholders_list = [os.path.join(CWR,"metadata.xml")]
 generated_files_list = ['product/product.json','product/granules.json','product/thumbnail.jpeg', 'product/owsLinks.json']
 
 product_zip_task = Sentinel2ProductZipOperator(task_id = 'create_product_zip_task',
