@@ -31,7 +31,8 @@ geoserver_rest_url = 'http://localhost:8080/geoserver/rest'
 geoserver_username = 'admin'
 geoserver_password = ''
 
-eoxserver_rest_url = 'http://localhost:8080/eoxserver/product/'
+#eoxserver_rest_url = 'http://localhost:8080/eoxserver/product/'
+eoxserver_rest_url = None
 eoxserver_username = ''
 eoxserver_password = ''
 
