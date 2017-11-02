@@ -242,6 +242,17 @@ def generate_dag(area, download_dir, default_args):
                                   },
                                   dag=dag)
 
+    if CFG.eoxserver_rest_url:
+      publish_eox_task = PythonOperator(task_id="publish_product_eox_task",
+                                    python_callable=publish_product,
+                                    op_kwargs={
+                                      'geoserver_username': CFG.eoxserver_username,
+                                      'geoserver_password': CFG.eoxserver_password,
+                                      'geoserver_rest_endpoint': CFG.eoxserver_rest_url,
+                                      'get_inputs_from': product_zip_task.task_id,
+                                    },
+                                    dag = dag)
+
     download_thumbnail.set_upstream(search_task)
     download_metadata.set_upstream(search_task)
     for tid in download_tasks:
@@ -257,6 +268,9 @@ def generate_dag(area, download_dir, default_args):
     product_zip_task.set_upstream(generate_thumbnail)
     publish_task.set_upstream(upload_original_package_task)
     publish_task.set_upstream(product_zip_task)
+
+    if CFG.eoxserver_rest_url:
+        publish_eox_task.set_upstream(publish_task)
 
     return dag
 

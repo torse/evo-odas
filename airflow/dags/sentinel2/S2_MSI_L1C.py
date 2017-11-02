@@ -154,4 +154,17 @@ publish_task = PythonOperator(task_id="publish_product_task",
                               },
                               dag = dag)
 
-search_task >> download_task >> archive_task >> thumbnail_task >> metadata_task >> archive_wldprj_task >> product_zip_task >> publish_task
+if CFG.eoxserver_rest_url:
+  publish_eox_task = PythonOperator(task_id="publish_product_eox_task",
+                                python_callable=publish_product,
+                                op_kwargs={
+                                  'geoserver_username': '',
+                                  'geoserver_password': '',
+                                  'geoserver_rest_endpoint': CFG.eoxserver_rest_url,
+                                  'get_inputs_from': product_zip_task.task_id,
+                                },
+                                dag = dag)
+  search_task >> download_task >> archive_task >> thumbnail_task >> metadata_task >> archive_wldprj_task >> product_zip_task >> publish_task >> publish_eox_task
+  
+else:
+  search_task >> download_task >> archive_task >> thumbnail_task >> metadata_task >> archive_wldprj_task >> product_zip_task >> publish_task

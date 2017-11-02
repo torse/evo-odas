@@ -31,6 +31,10 @@ geoserver_rest_url = 'http://localhost:8080/geoserver/rest'
 geoserver_username = 'admin'
 geoserver_password = ''
 
+eoxserver_rest_url = 'http://localhost:8080/eoxserver/product/'
+eoxserver_username = ''
+eoxserver_password = ''
+
 postgresql_dbname = 'oseo'
 postgresql_hostname = 'localhost'
 postgresql_port = '5432'
