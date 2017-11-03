@@ -49,6 +49,7 @@ order_by = "acquisitiondate"
 order_type = ascending
 
 download_max = 1
+max_active_runs = 1
 
 # For multi paths/rows, please add different paths/rows in pairs  e.g: paths_rows= [(37,17), (38,18)] which will search for those 2 scenes.
 # For single path/row, please declare as following example: paths_rows=[(80,37)]
