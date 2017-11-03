@@ -246,4 +246,5 @@ for task in upload_tasks:
     metadata_task.set_upstream(task)
 
 publish_task.set_upstream(metadata_task)
-publish_eox_task.set_upstream(metadata_task)
+if CFG.eoxserver_rest_url:
+  publish_eox_task.set_upstream(metadata_task)

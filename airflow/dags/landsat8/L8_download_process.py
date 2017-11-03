@@ -21,20 +21,6 @@ from landsat8_plugin import create_original_package
 import config as CFG
 import config.landsat8 as LANDSAT8
 
-
-# These ought to be moved to a more central place where other settings might
-# be stored
-PROJECT_ROOT = os.path.dirname(
-    os.path.dirname(
-        os.path.dirname(
-            os.path.dirname(__file__)
-        )
-    )
-)
-
-TEMPLATES_PATH = os.path.join(PROJECT_ROOT, "metadata-ingestion", "templates")
-
-
 def generate_dag(area, download_dir, default_args):
     """Generate Landsat8 ingestion DAGs.
 
@@ -55,6 +41,7 @@ def generate_dag(area, download_dir, default_args):
         dagrun_timeout=LANDSAT8.dagrun_timeout,
         schedule_interval=LANDSAT8.dag_schedule_interval,
         catchup=LANDSAT8.catchup,
+	max_active_runs=LANDSAT8.max_active_runs,
         params={
             "area": area,
         }
@@ -74,7 +61,7 @@ def generate_dag(area, download_dir, default_args):
     generate_html_description = Landsat8ProductDescriptionOperator(
         task_id='generate_html_description',
         description_template=os.path.join(
-            TEMPLATES_PATH, "product_abstract.html"),
+            CFG.templates_base_dir, "product_abstract.html"),
         download_dir=download_dir,
         dag=dag
     )
@@ -229,7 +216,7 @@ def generate_dag(area, download_dir, default_args):
             "gdalinfo_task_id": gdalinfo_task_id,
             "upload_original_package_task_id": upload_original_package_task.task_id,
         },
-        metadata_xml_path=os.path.join(TEMPLATES_PATH, "metadata.xml"),
+        metadata_xml_path=os.path.join(CFG.templates_base_dir, "metadata.xml"),
         dag=dag
     )
 
@@ -256,6 +243,17 @@ def generate_dag(area, download_dir, default_args):
                                   },
                                   dag=dag)
 
+    if CFG.eoxserver_rest_url:
+      publish_eox_task = PythonOperator(task_id="publish_product_eox_task",
+                                    python_callable=publish_product,
+                                    op_kwargs={
+                                      'geoserver_username': CFG.eoxserver_username,
+                                      'geoserver_password': CFG.eoxserver_password,
+                                      'geoserver_rest_endpoint': CFG.eoxserver_rest_url,
+                                      'get_inputs_from': product_zip_task.task_id,
+                                    },
+                                    dag = dag)
+
     download_thumbnail.set_upstream(search_task)
     download_metadata.set_upstream(search_task)
     for tid in download_tasks:
@@ -271,6 +269,9 @@ def generate_dag(area, download_dir, default_args):
     product_zip_task.set_upstream(generate_thumbnail)
     publish_task.set_upstream(upload_original_package_task)
     publish_task.set_upstream(product_zip_task)
+
+    if CFG.eoxserver_rest_url:
+        publish_eox_task.set_upstream(publish_task)
 
     return dag
 
